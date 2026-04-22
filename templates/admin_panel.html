@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>JAGWAR HOSTING - لوحة المشرف</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Tahoma', 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 16px;
+        }
+
+        /* الشريط الجانبي للهاتف */
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-right: 1px solid #ff4757;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar h2 {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .user-info {
+            background: rgba(255, 71, 87, 0.15);
+            padding: 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .stats {
+            background: rgba(255, 71, 87, 0.1);
+            padding: 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            background: #334155;
+            height: 6px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #ff4757, #ff6b81);
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .menu-btn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            background: rgba(255, 71, 87, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            font-size: 24px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .main-content {
+            margin-top: 60px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+        }
+
+        .card h3 {
+            color: #ff6b81;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 71, 87, 0.15);
+            padding: 16px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b81;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .add-user-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .add-user-form input, .add-user-form select {
+            padding: 14px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(255, 71, 87, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .user-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .user-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th, .user-table td {
+            padding: 12px 8px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255, 71, 87, 0.2);
+            font-size: 13px;
+        }
+
+        .user-table th {
+            color: #ff6b81;
+        }
+
+        .project-item {
+            background: rgba(51, 65, 85, 0.5);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .running-process {
+            background: #10b981;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-number {
+                font-size: 22px;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+
+    <div class="sidebar" id="sidebar">
+        <h2>🐺 JAGWAR</h2>
+        <div class="user-info">
+            <div>👑 {{ session.username }}</div>
+            <div style="font-size: 12px;">مدير النظام</div>
+        </div>
+        <div class="stats">
+            <h4>📊 الموارد</h4>
+            <div>💾 RAM: <span id="ram-value">{{ stats.ram_used }}/{{ stats.ram_total }} GB</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="ram-fill" style="width: {{ stats.ram_percent }}%"></div></div>
+            <div style="margin-top: 10px;">🖥️ CPU: <span id="cpu-value">{{ stats.cpu_percent }}%</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="cpu-fill" style="width: {{ stats.cpu_percent }}%"></div></div>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 تسجيل خروج</button>
+    </div>
+
+    <div class="main-content">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-number" id="user-count">{{ users|length }}</div><div class="stat-label">المستخدمين</div></div>
+            <div class="stat-card"><div class="stat-number" id="project-count"></div><div class="stat-label">المشاريع</div></div>
+            <div class="stat-card"><div class="stat-number">{{ running_processes|length }}</div><div class="stat-label">عمليات نشطة</div></div>
+        </div>
+
+        <div class="card">
+            <h3>➕ إضافة مستخدم</h3>
+            <div class="add-user-form">
+                <input type="text" id="new-username" placeholder="اسم المستخدم">
+                <input type="password" id="new-password" placeholder="كلمة السر">
+                <select id="new-role"><option value="user">مستخدم</option><option value="admin">مشرف</option></select>
+                <button class="btn-primary" onclick="addUser()">إضافة</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>👥 المستخدمين</h3>
+            <div class="user-table">
+                <table>
+                    <thead><tr><th>المستخدم</th><th>الصلاحية</th><th>المشاريع</th><th></th></tr></thead>
+                    <tbody id="users-list">
+                        {% for username, user_data in users.items() %}
+                        <tr><td>{{ username }}</td><td>{% if user_data.role == 'admin' %}👑 مشرف{% else %}👤 مستخدم{% endif %}</td><td>{{ projects.get(username, [])|length }}</td>
+                        <td>{% if username != 'RAGNAR' %}<button class="btn-danger" onclick="deleteUser('{{ username }}')">🗑️</button>{% endif %}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📁 المشاريع</h3>
+            {% for username, user_projects in projects.items() %}
+            <div style="margin-bottom: 12px;"><div style="color: #ff6b81;">👤 {{ username }}</div>
+            {% for project in user_projects %}<div class="project-item">📂 {{ project }}</div>{% endfor %}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function logout() { window.location.href = '/logout'; }
+        
+        async function addUser() {
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const role = document.getElementById('new-role').value;
+            if (!username || !password) { alert('املأ جميع الحقول'); return; }
+            const response = await fetch('/add_user', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username, password, role}) });
+            if ((await response.json()).success) location.reload(); else alert('المستخدم موجود');
+        }
+        
+        async function deleteUser(username) {
+            if (!confirm(`حذف ${username}؟`)) return;
+            await fetch('/delete_user', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username}) });
+            location.reload();
+        }
+        
+        async function updateStats() {
+            const response = await fetch('/get_stats');
+            const stats = await response.json();
+            document.getElementById('ram-value').innerHTML = `${stats.ram_used}/${stats.ram_total} GB`;
+            document.getElementById('ram-fill').style.width = `${stats.ram_percent}%`;
+            document.getElementById('cpu-value').innerHTML = `${stats.cpu_percent}%`;
+            document.getElementById('cpu-fill').style.width = `${stats.cpu_percent}%`;
+        }
+        
+        setInterval(updateStats, 3000);
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.menu-btn');
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !menuBtn.contains(e.target))
+                sidebar.classList.remove('open');
+        });
+    </script>
+</body>
+</html>
