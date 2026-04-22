@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>JAGWAR HOSTING - لوحة المستخدم</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Tahoma', 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding-bottom: 20px;
+        }
+
+        /* الشريط الجانبي للهاتف */
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-right: 1px solid #3b82f6;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar h2 {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .user-info {
+            background: rgba(59, 130, 246, 0.15);
+            padding: 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .user-info div:first-child {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stats {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stats h4 {
+            color: #60a5fa;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            margin: 12px 0;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .progress-bar {
+            background: #334155;
+            height: 6px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            height: 100%;
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .logout-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* زر القائمة */
+        .menu-btn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            background: rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            font-size: 24px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:active {
+            background: rgba(59, 130, 246, 0.4);
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            padding: 70px 16px 20px 16px;
+        }
+
+        /* البطاقات */
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.99);
+        }
+
+        .card h3 {
+            color: #60a5fa;
+            margin-bottom: 16px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* نموذج المشروع الجديد */
+        .new-project {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .new-project input {
+            padding: 14px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(59, 130, 246, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+            color: white;
+            font-size: 16px;
+        }
+
+        .new-project input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #059669, #10b981);
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+        }
+
+        .btn-warning {
+            background: linear-gradient(90deg, #d97706, #f59e0b);
+        }
+
+        /* قائمة المشاريع */
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .project-item {
+            background: rgba(51, 65, 85, 0.8);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .project-item:active {
+            background: #3b82f6;
+            transform: translateX(5px);
+        }
+
+        .project-name {
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        /* منطقة تحرير المشروع */
+        .editor-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .file-manager {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            padding: 16px;
+        }
+
+        .file-list {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .console {
+            background: #0a0a0a;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            padding: 16px;
+            border-radius: 16px;
+            height: 250px;
+            overflow-y: auto;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .settings {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .settings select {
+            padding: 12px;
+            border-radius: 12px;
+            background: #334155;
+            color: white;
+            border: none;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 16px;
+            font-weight: bold;
+        }
+
+        .upload-area {
+            margin: 12px 0;
+        }
+
+        .upload-area input {
+            width: 100%;
+            padding: 10px;
+            background: #334155;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .inline-input {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .inline-input input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            background: #334155;
+            border: none;
+            color: white;
+        }
+
+        .inline-input button {
+            padding: 10px 16px;
+        }
+
+        /* شاشة التحميل */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #3b82f6;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* تحسينات للهواتف */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 60px 12px 20px 12px;
+            }
+            
+            .card {
+                padding: 16px;
+                border-radius: 20px;
+            }
+            
+            .project-item {
+                padding: 14px;
+            }
+            
+            .settings select {
+                padding: 10px;
+            }
+        }
+
+        /* منع التكبير */
+        @media (max-width: 768px) {
+            input, select, textarea, button {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+
+    <div class="sidebar" id="sidebar">
+        <h2>🐺 JAGWAR</h2>
+        <div class="user-info">
+            <div>👤 {{ username }}</div>
+            <div style="font-size: 12px; color: #60a5fa;">مستخدم</div>
+        </div>
+        <div class="stats">
+            <h4>📊 مراقبة الموارد</h4>
+            <div class="stat-item">
+                <div class="stat-label">💾 RAM</div>
+                <div class="stat-value" id="ram-used">{{ stats.ram_used }} / {{ stats.ram_total }} GB</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="ram-fill" style="width: {{ stats.ram_percent }}%"></div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">🖥️ CPU</div>
+                <div class="stat-value" id="cpu-percent">{{ stats.cpu_percent }}%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="cpu-fill" style="width: {{ stats.cpu_percent }}%"></div>
+                </div>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 تسجيل خروج</button>
+    </div>
+
+    <div class="main-content">
+        <div class="card">
+            <h3>✨ مشروع جديد</h3>
+            <div class="new-project">
+                <input type="text" id="new-project-name" placeholder="اسم المشروع">
+                <button class="btn-primary" onclick="createProject()">➕ إنشاء مشروع</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📁 مشاريعي</h3>
+            <div class="project-list" id="project-list">
+                {% for project in projects %}
+                <div class="project-item" onclick="selectProject('{{ project }}')">
+                    <span class="project-name">📂 {{ project }}</span>
+                    <button class="btn-danger" onclick="event.stopPropagation(); deleteProject('{{ project }}')">🗑️</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="project-editor" style="display: none;">
+            <div class="card">
+                <h3 id="current-project-title"></h3>
+                
+                <div class="settings">
+                    <select id="main-file">
+                        <option value="">📄 MAIN FILE</option>
+                    </select>
+                    <select id="req-file">
+                        <option value="">📦 REQUIREMENTS FILE</option>
+                    </select>
+                    <div class="button-group">
+                        <button class="btn-success" onclick="runProject()">▶️ START</button>
+                        <button class="btn-warning" onclick="stopProject()">⏹️ STOP</button>
+                    </div>
+                </div>
+
+                <div class="editor-area">
+                    <div class="file-manager">
+                        <h4>📁 FILE MANAGER</h4>
+                        <div class="upload-area">
+                            <input type="file" id="upload-file" accept=".py,.txt,.json,.yml">
+                            <button class="btn-primary" onclick="uploadFile()">📤 رفع ملف</button>
+                        </div>
+                        
+                        <div class="inline-input">
+                            <input type="text" id="new-filename" placeholder="اسم الملف الجديد">
+                            <button class="btn-primary" onclick="createFile()">➕ إنشاء</button>
+                        </div>
+                        
+                        <div class="file-list" id="file-list"></div>
+                    </div>
+                    
+                    <div>
+                        <h4>📋 CONSOLE</h4>
+                        <div class="console" id="console"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProject = null;
+        let logInterval = null;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        async function createProject() {
+            const name = document.getElementById('new-project-name').value;
+            if (!name) return;
+            
+            showLoading();
+            const response = await fetch('/create_project', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({project_name: name})
+            });
+            
+            if (response.ok) {
+                location.reload();
+            }
+            hideLoading();
+        }
+
+        async function deleteProject(name) {
+            if (!confirm('🗑️ هل تريد حذف هذا المشروع؟')) return;
+            
+            showLoading();
+            const response = await fetch('/delete_project', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({project_name: name})
+            });
+            
+            if (response.ok) {
+                location.reload();
+            }
+            hideLoading();
+        }
+
+        async function selectProject(name) {
+            currentProject = name;
+            document.getElementById('project-editor').style.display = 'block';
+            document.getElementById('current-project-title').innerHTML = `📂 ${name}`;
+            document.getElementById('sidebar').classList.remove('open');
+            
+            await loadFiles();
+            startLogPolling();
+        }
+
+        async function loadFiles() {
+            const response = await fetch(`/get_files?project=${currentProject}`);
+            const data = await response.json();
+            
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            
+            const mainSelect = document.getElementById('main-file');
+            const reqSelect = document.getElementById('req-file');
+            
+            mainSelect.innerHTML = '<option value="">📄 MAIN FILE</option>';
+            reqSelect.innerHTML = '<option value="">📦 REQUIREMENTS FILE</option>';
+            
+            data.files.forEach(file => {
+                fileList.innerHTML += `
+                    <div class="file-item">
+                        <span>📄 ${file}</span>
+                        <button class="btn-danger" onclick="deleteFile('${file}')" style="padding: 4px 10px;">🗑️</button>
+                    </div>
+                `;
+                
+                if (file.endsWith('.py')) {
+                    mainSelect.innerHTML += `<option value="${file}">🐍 ${file}</option>`;
+                }
+                if (file === 'requirements.txt') {
+                    reqSelect.innerHTML += `<option value="${file}">📋 ${file}</option>`;
+                }
+            });
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('upload-file');
+            const file = fileInput.files[0];
+            if (!file) return;
+            
+            showLoading();
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('project', currentProject);
+            
+            const response = await fetch('/upload_file', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                await loadFiles();
+                fileInput.value = '';
+            }
+            hideLoading();
+        }
+
+        async function createFile() {
+            const filename = document.getElementById('new-filename').value;
+            if (!filename) return;
+            
+            showLoading();
+            const response = await fetch('/create_file', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    project: currentProject,
+                    filename: filename,
+                    content: ''
+                })
+            });
+            
+            if (response.ok) {
+                await loadFiles();
+                document.getElementById('new-filename').value = '';
+            }
+            hideLoading();
+        }
+
+        async function deleteFile(filename) {
+            if (!confirm(`🗑️ حذف ${filename}؟`)) return;
+            
+            const response = await fetch('/delete_file', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    project: currentProject,
+                    filename: filename
+                })
+            });
+            
+            if (response.ok) {
+                await loadFiles();
+            }
+        }
+
+        async function runProject() {
+            const mainFile = document.getElementById('main-file').value;
+            const reqFile = document.getElementById('req-file').value;
+            
+            if (!mainFile) {
+                alert('⚠️ الرجاء اختيار MAIN FILE');
+                return;
+            }
+            
+            showLoading();
+            const response = await fetch('/run_project', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    project: currentProject,
+                    main_file: mainFile,
+                    req_file: reqFile
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                startLogPolling();
+            }
+            hideLoading();
+        }
+
+        async function stopProject() {
+            showLoading();
+            const response = await fetch('/stop_project', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({project: currentProject})
+            });
+            
+            if (response.ok) {
+                const consoleDiv = document.getElementById('console');
+                consoleDiv.innerHTML += '\n[✓] تم إيقاف التشغيل\n';
+            }
+            hideLoading();
+        }
+
+        function startLogPolling() {
+            if (logInterval) clearInterval(logInterval);
+            
+            async function fetchLogs() {
+                const response = await fetch(`/get_logs?project=${currentProject}`);
+                const data = await response.json();
+                const consoleDiv = document.getElementById('console');
+                consoleDiv.innerHTML = data.logs || '✨ لا توجد سجلات...\n🟢 جاهز للتشغيل';
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            }
+            
+            fetchLogs();
+            logInterval = setInterval(fetchLogs, 2000);
+        }
+
+        async function updateStats() {
+            const response = await fetch('/get_stats');
+            const stats = await response.json();
+            
+            document.getElementById('ram-used').innerHTML = `${stats.ram_used} / ${stats.ram_total} GB`;
+            document.getElementById('ram-fill').style.width = `${stats.ram_percent}%`;
+            document.getElementById('cpu-percent').innerHTML = `${stats.cpu_percent}%`;
+            document.getElementById('cpu-fill').style.width = `${stats.cpu_percent}%`;
+        }
+
+        function showLoading() {
+            let loading = document.querySelector('.loading');
+            if (!loading) {
+                loading = document.createElement('div');
+                loading.className = 'loading';
+                loading.innerHTML = '<div class="spinner"></div>';
+                document.body.appendChild(loading);
+            }
+            loading.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            const loading = document.querySelector('.loading');
+            if (loading) loading.style.display = 'none';
+        }
+
+        setInterval(updateStats, 3000);
+        
+        // إغلاق القائمة عند النقر خارجها
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.menu-btn');
+            if (sidebar.classList.contains('open') && 
+                !sidebar.contains(event.target) && 
+                !menuBtn.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
