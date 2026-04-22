@@ -4,29 +4,20 @@ import psutil
 import json
 import os
 import shutil
-import threading
 import time
 from datetime import datetime
-import sys
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "JAGWAR_HOSTING_SECRET_KEY_2024")
+app.secret_key = "JAGWAR_HOSTING_SECRET_KEY_2024"
 
-# ==================== إعدادات التخزين لـ Hugging Face ====================
-# استخدام مجلد البيانات الدائم في Hugging Face
-DATA_DIR = os.environ.get("DATA_DIR", "/data")
-if not os.path.exists(DATA_DIR):
-    # إذا لم يكن /data متاحاً (في Hugging Face المجاني)، استخدم مجلد محلي
-    DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-
+# ==================== إعدادات التخزين ====================
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
 PROJECTS_DIR = os.path.join(DATA_DIR, "projects")
 LOGS_DIR = os.path.join(DATA_DIR, "logs")
 
-# إنشاء المجلدات
 for dir_path in [DATA_DIR, PROJECTS_DIR, LOGS_DIR]:
     os.makedirs(dir_path, exist_ok=True)
-    print(f"✅ مجلد جاهز: {dir_path}")
 
 # ==================== إدارة المستخدمين ====================
 def load_users():
@@ -95,53 +86,38 @@ def run_project(username, project_name, main_file, req_file):
     project_path = os.path.join(PROJECTS_DIR, username, project_name)
     process_id = f"{username}_{project_name}"
     
-    try:
-        if req_file and req_file != "":
-            req_path = os.path.join(project_path, req_file)
-            if os.path.exists(req_path):
-                result = subprocess.run(
-                    f"{sys.executable} -m pip install -r {req_path}",
+    if req_file and req_file != "":
+        req_path = os.path.join(project_path, req_file)
+        if os.path.exists(req_path):
+            subprocess.run(f"pip install -r {req_path}", shell=True, cwd=project_path)
+    
+    if main_file and main_file != "":
+        main_path = os.path.join(project_path, main_file)
+        if os.path.exists(main_path):
+            log_file = os.path.join(LOGS_DIR, f"{process_id}.log")
+            with open(log_file, 'w') as f:
+                process = subprocess.Popen(
+                    f"python {main_file}",
                     shell=True,
                     cwd=project_path,
-                    capture_output=True,
-                    text=True,
-                    timeout=300
+                    stdout=f,
+                    stderr=subprocess.STDOUT
                 )
-                print(f"PIP install: {result.stdout}")
-        
-        if main_file and main_file != "":
-            main_path = os.path.join(project_path, main_file)
-            if os.path.exists(main_path):
-                log_file = os.path.join(LOGS_DIR, f"{process_id}.log")
-                with open(log_file, 'w') as f:
-                    process = subprocess.Popen(
-                        f"{sys.executable} {main_file}",
-                        shell=True,
-                        cwd=project_path,
-                        stdout=f,
-                        stderr=subprocess.STDOUT,
-                        text=True
-                    )
-                running_processes[process_id] = {
-                    "process": process,
-                    "log_file": log_file,
-                    "start_time": str(datetime.now())
-                }
-                return True
-    except Exception as e:
-        print(f"Error: {e}")
+            running_processes[process_id] = {
+                "process": process,
+                "log_file": log_file,
+                "start_time": str(datetime.now())
+            }
+            return True
     return False
 
 def stop_project(username, project_name):
     process_id = f"{username}_{project_name}"
     if process_id in running_processes:
-        try:
-            running_processes[process_id]["process"].terminate()
-            time.sleep(1)
-            if running_processes[process_id]["process"].poll() is None:
-                running_processes[process_id]["process"].kill()
-        except:
-            pass
+        running_processes[process_id]["process"].terminate()
+        time.sleep(1)
+        if running_processes[process_id]["process"].poll() is None:
+            running_processes[process_id]["process"].kill()
         del running_processes[process_id]
         return True
     return False
@@ -158,12 +134,11 @@ def get_logs(username, project_name):
 def get_system_stats():
     try:
         ram = psutil.virtual_memory()
-        cpu_percent = psutil.cpu_percent(interval=0.5)
         return {
             "ram_used": round(ram.used / (1024**3), 1),
             "ram_total": round(ram.total / (1024**3), 1),
             "ram_percent": ram.percent,
-            "cpu_percent": cpu_percent
+            "cpu_percent": psutil.cpu_percent(interval=0.5)
         }
     except:
         return {
@@ -174,7 +149,6 @@ def get_system_stats():
         }
 
 # ==================== Routes ====================
-
 @app.route('/')
 def root():
     if 'username' in session:
@@ -382,15 +356,6 @@ def get_stats_route():
     stats = get_system_stats()
     return jsonify(stats)
 
-# ==================== تشغيل التطبيق ====================
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 7860))
-    print("\n" + "="*50)
-    print("🐺 JAGWAR HOSTING - تم التشغيل بنجاح!")
-    print("="*50)
-    print(f"📍 المنفذ: {port}")
-    print(f"🔑 بيانات الدخول: RAGNAR / RAGNAR-HOST")
-    print(f"💾 مجلد البيانات: {DATA_DIR}")
-    print("="*50 + "\n")
-    
+    port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port, debug=False)
